@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>바코드 생성기</title>
+  <script src="https://cdn.jsdelivr.net/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input {
+      font-size: 1.2em;
+      padding: 0.5em;
+      width: 250px;
+    }
+    button {
+      font-size: 1em;
+      margin: 10px;
+      padding: 0.6em 1.2em;
+    }
+    svg {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>바코드 생성기</h1>
+  <input type="text" id="barcodeInput" placeholder="바코드 입력 (숫자 또는 문자)">
+  <div>
+    <button onclick="generateBarcode()">바코드 생성</button>
+    <button onclick="window.print()">프린트</button>
+  </div>
+  <svg id="barcode"></svg>
+
+  <script>
+    function generateBarcode() {
+      const input = document.getElementById("barcodeInput").value;
+      if (input.trim() === "") {
+        alert("바코드 내용을 입력해주세요!");
+        return;
+      }
+      JsBarcode("#barcode", input, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 100,
+        displayValue: true
+      });
+    }
+  </script>
+</body>
+</html>
