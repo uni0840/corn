@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>바코드 생성기</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input {
+      font-size: 1.2em;
+      padding: 0.5em;
+      width: 250px;
+    }
+    button {
+      font-size: 1em;
+      margin: 10px;
+      padding: 0.6em 1.2em;
+    }
+    svg {
+      margin-top: 20px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        padding-top: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>바코드 생성기</h1>
+  <input type="text" id="barcodeInput" placeholder="바코드 입력 (숫자 또는 문자)" oninput="generateBarcode()">
+  <div>
+    <button onclick="printBarcode()">프린트</button>
+  </div>
+
+  <div id="printArea">
+    <svg id="barcode"></svg>
+  </div>
+
+  <script>
+    function generateBarcode() {
+      const input = document.getElementById("barcodeInput").value.trim();
+      const barcodeEl = document.getElementById("barcode");
+
+      barcodeEl.innerHTML = "";
+
+      if (!input) return;
+
+      JsBarcode(barcodeEl, input, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 100,
+        displayValue: true
+      });
+    }
+
+    function printBarcode() {
+      const input = document.getElementById("barcodeInput").value.trim();
+      if (!input) {
+        alert("바코드 내용을 입력해주세요!");
+        return;
+      }
+      window.print();
+    }
+  </script>
+</body>
+</html>
