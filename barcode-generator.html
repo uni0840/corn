@@ -36,21 +36,6 @@
       max-width: 400px;
     }
 
-    table.custom-table {
-      margin: 30px auto;
-      border: 1px solid skyblue;
-      border-radius: 10px;
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    table.custom-table td {
-      padding: 10px;
-    }
-
     @media print {
       body * {
         visibility: hidden;
@@ -82,16 +67,6 @@
     <svg id="barcode"></svg>
   </div>
 
-  <!-- 🔽 추가된 고정 테이블 영역 -->
-  <table class="custom-table">
-    <tr>
-      <td>
-        <div style="font-size: 1.2em; margin-bottom: 10px;">145-OC0-1-1</div>
-        <svg id="fixedBarcode"></svg>
-      </td>
-    </tr>
-  </table>
-
   <script>
     function generateBarcode() {
       const input = document.getElementById("barcodeInput").value.trim();
@@ -118,17 +93,6 @@
       }
       window.print();
     }
-
-    // 🔧 고정 바코드 (145-OC0-1-1) 초기 렌더링
-    window.onload = function () {
-      JsBarcode("#fixedBarcode", "145-OC0-1-1", {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 100,
-        displayValue: false
-      });
-    };
   </script>
 </body>
 </html>
