@@ -73,7 +73,7 @@
 
   <!-- <h1>바코드 생성기</h1> -->
 
-  <input type="text" id="barcodeInput" placeholder="바코드 입력 (숫자 또는 영어)" oninput="generateBarcode()">
+  <input type="text" id="barcodeInput" placeholder="바코드 입력 (숫자 또는 문자)" oninput="generateBarcode()">
   <div>
     <button onclick="printBarcode()">프린트</button>
   </div>
@@ -82,7 +82,8 @@
     <svg id="barcode"></svg>
   </div>
 
-  <!-- 🔽 추가된 고정 테이블 영역 -->
+  <!-- 하늘색 테두리 안의 고정 바코드 테이블 주석 처리 시작 -->
+  <!--
   <table class="custom-table">
     <tr>
       <td>
@@ -91,6 +92,7 @@
       </td>
     </tr>
   </table>
+  -->
 
   <script>
     function generateBarcode() {
@@ -118,8 +120,9 @@
       }
       window.print();
     }
-    
-    // 🔧 고정 바코드 (145-OC0-1-1) 초기 렌더링
+
+    // 145-OC0-1-1 바코드 주석 처리된 경우 이 코드도 비활성화 필요
+    /*
     window.onload = function () {
       JsBarcode("#fixedBarcode", "145-OC0-1-1", {
         format: "CODE128",
@@ -129,6 +132,7 @@
         displayValue: false
       });
     };
+    */
   </script>
 </body>
 </html>
