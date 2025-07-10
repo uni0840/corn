@@ -37,10 +37,6 @@
       cursor: pointer;
     }
 
-    .barcode-spacing {
-      height: 30px;
-    }
-
     @media print {
       body * {
         visibility: hidden;
@@ -56,16 +52,12 @@
         left: 0;
         width: 100%;
         text-align: center;
-        padding-top: 2em;
+        padding-top: 3cm; /* ✅ 정확한 상단 여백 */
       }
 
       svg#barcode {
-        transform: scale(1.2);
+        transform: scale(1.0); /* ✅ 확대로 인해 잘리지 않게 */
         transform-origin: top center;
-      }
-
-      .barcode-spacing {
-        height: 60px;
       }
 
       input, button {
@@ -105,10 +97,10 @@
         width: 3,
         height: 150,
         margin: 10,
-        displayValue: true,       // ✅ 입력값을 SVG 내부에 표시
-        fontSize: 26,             // ✅ 글자 크기
-        textMargin: 10,           // ✅ 바코드와 텍스트 사이 여백
-        fontOptions: "bold"       // ✅ 볼드체
+        displayValue: true,
+        fontSize: 30,
+        textMargin: 10,
+        fontOptions: "bold"
       });
     }
 
@@ -129,11 +121,11 @@
       const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
       const url = URL.createObjectURL(blob);
 
+      const inputValue = document.getElementById("barcodeInput").value.trim();
+      const fileName = inputValue ? `${inputValue}.svg` : "barcode.svg"; // ✅ prefix 제거
+
       const a = document.createElement("a");
       a.href = url;
-
-      const inputValue = document.getElementById("barcodeInput").value.trim();
-      const fileName = inputValue ? `${inputValue}.svg` : "barcode.svg";
       a.download = fileName;
 
       document.body.appendChild(a);
