@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barcode Generator</title>
+  <title>Barcode Generator-SVG, Print</title>
+
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
   <style>
     body {
       font-family: sans-serif;
@@ -16,25 +18,30 @@
     input {
       font-size: 1.2em;
       padding: 0.5em;
-      width: 90%;
-      max-width: 300px;
-      box-sizing: border-box;
+      width: min(90vw, 300px);
     }
 
     button {
       font-size: 1em;
       margin: 10px;
       padding: 0.6em 1.2em;
-      width: 90%;
-      max-width: 150px;
+      width: min(90vw, 150px);
+    }
+
+    #printArea {
+      text-align: left;
+      margin: 0 auto;
+      width: 93mm; /* 105mm - 2*6mm 예상 여백 */
+      padding: 0;
       box-sizing: border-box;
     }
 
-    svg {
-      margin-top: 20px;
-      width: 90%;
-      max-width: 400px;
-      cursor: pointer;
+    #barcode {
+      display: block;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: auto;
     }
 
     @media print {
@@ -50,14 +57,10 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        text-align: center;
-        padding-top: 3cm; /* ✅ 정확한 상단 여백 */
-      }
-
-      svg#barcode {
-        transform: scale(1.0); /* ✅ 확대로 인해 잘리지 않게 */
-        transform-origin: top center;
+        margin: 0;
+        padding: 0;
+        width: 93mm;
+        height: auto;
       }
 
       input, button {
@@ -68,73 +71,71 @@
 </head>
 <body>
 
-  <input
-    type="text"
-    id="barcodeInput"
-    placeholder="바코드 입력 (숫자 또는 문자)"
-    oninput="generateBarcode()" />
+<input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
+<div>
+  <button onclick="printBarcode()">프린트</button>
+  <button onclick="saveAsSvg()">파일(.svg)저장</button>
+</div>
 
-  <div>
-    <button onclick="printBarcode()">프린트</button>
-  </div>
+<div id="printArea">
+  <svg id="barcode"></svg>
+</div>
 
-  <div id="printArea">
-    <svg id="barcode" onclick="saveSvgAsFile()"></svg>
-  </div>
+<script>
+  function generateBarcode() {
+    const input = document.getElementById("barcodeInput").value.trim();
+    const barcode = document.getElementById("barcode");
+    barcode.innerHTML = "";
 
-  <script>
-    function generateBarcode() {
-      const input = document.getElementById("barcodeInput").value.trim();
-      const barcodeEl = document.getElementById("barcode");
+    if (!input) return;
 
-      barcodeEl.innerHTML = "";
+    JsBarcode(barcode, input, {
+      format: "CODE128",
+      lineColor: "#000",
+      width: 2,
+      height: 100,
+      margin: 10,
+      displayValue: true,
+      fontSize: 25,
+      textMargin: 13,
+      fontOptions: "bold",
+      font: "Sans-serif"
+    });
+  }
 
-      if (!input) return;
+  function printBarcode() {
+    const input = document.getElementById("barcodeInput").value.trim();
+    if (!input) {
+      alert("바코드 내용을 입력해주세요!");
+      return;
+    }
+    window.print();
+  }
 
-      JsBarcode(barcodeEl, input, {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 3,
-        height: 150,
-        margin: 10,
-        displayValue: true,
-        fontSize: 30,
-        textMargin: 10,
-        fontOptions: "bold"
-      });
+  function saveAsSvg() {
+    const input = document.getElementById("barcodeInput").value.trim();
+    if (!input) {
+      alert("저장할 바코드 값을 입력해주세요!");
+      return;
     }
 
-    function printBarcode() {
-      const input = document.getElementById("barcodeInput").value.trim();
-      if (!input) {
-        alert("바코드 내용을 입력해주세요!");
-        return;
-      }
-      window.print();
-    }
+    const svg = document.getElementById("barcode");
+    const serializer = new XMLSerializer();
+    const svgData = serializer.serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
 
-    function saveSvgAsFile() {
-      const svg = document.getElementById("barcode");
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${input}.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 
-      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
+  window.onload = generateBarcode;
+</script>
 
-      const inputValue = document.getElementById("barcodeInput").value.trim();
-      const fileName = inputValue ? `${inputValue}.svg` : "barcode.svg"; // ✅ prefix 제거
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    window.onload = generateBarcode;
-  </script>
 </body>
 </html>
