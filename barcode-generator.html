@@ -15,10 +15,17 @@
       margin: 0;
     }
 
-    input {
+    textarea, input {
       font-size: 1.2em;
       padding: 0.5em;
       width: min(90vw, 300px);
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: none;
+      height: 4em;
+      font-weight: bold;
     }
 
     button {
@@ -34,10 +41,18 @@
     }
 
     #barcode {
-      width: 300px;     /* 바코드 고정 폭 */
-      height: 150px;    /* 충분한 높이 확보 */
+      width: 300px;
+      height: 150px;
       display: block;
       margin: 0 auto;
+    }
+
+    #memoDisplay {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     @media print {
@@ -55,10 +70,14 @@
         left: 0;
         margin: 0;
         padding: 0;
-        width: 93mm; /* A6 인쇄 시 좌우 1cm 여백 확보 */
+        width: 93mm;
       }
 
-      input, button {
+      #memoDisplay {
+        font-size: 35px !important;
+      }
+
+      textarea, input, button {
         display: none;
       }
     }
@@ -66,6 +85,7 @@
 </head>
 
 <body>
+  <textarea id="memoInput" placeholder="바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
   <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
   <div>
     <button onclick="printBarcode()">프린트</button>
@@ -73,14 +93,23 @@
   </div>
 
   <div id="printArea">
+    <div id="memoDisplay"></div>
     <svg id="barcode"></svg>
   </div>
 
   <script>
     function generateBarcode() {
       const input = document.getElementById("barcodeInput").value.trim();
+      const memo = document.getElementById("memoInput").value.trim();
       const barcode = document.getElementById("barcode");
+      const memoDisplay = document.getElementById("memoDisplay");
+
       barcode.innerHTML = "";
+      memoDisplay.innerHTML = "";
+
+      if (memo) {
+        memoDisplay.textContent = insertLineBreaks(memo, 14);
+      }
 
       if (!input) return;
 
@@ -95,8 +124,16 @@
         textMargin: 13,
         fontOptions: "bold",
         font: "Sans-serif",
-        fit: false  // 🔒 바코드 크기 고정
+        fit: false
       });
+    }
+
+    function insertLineBreaks(text, maxChars) {
+      let result = '';
+      for (let i = 0; i < text.length; i += maxChars) {
+        result += text.substr(i, maxChars) + '\n';
+      }
+      return result.trim();
     }
 
     function printBarcode() {
@@ -110,14 +147,52 @@
 
     function saveAsSvg() {
       const input = document.getElementById("barcodeInput").value.trim();
+      const rawMemo = document.getElementById("memoInput").value.trim();
+      const barcodeSvg = document.getElementById("barcode");
+
       if (!input) {
         alert("저장할 바코드 값을 입력해주세요!");
         return;
       }
 
-      const svg = document.getElementById("barcode");
+      const maxCharsPerLine = 14;
+      const memoLines = insertLineBreaks(rawMemo, maxCharsPerLine).split("\n");
+
+      const lineHeight = 45;
+      const memoTopOffset = 45;
+      const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
+      const barcodeHeight = 130; // barcode + input text
+      const totalHeight = barcodeTopOffset + barcodeHeight + 20;
+
+      const totalWidth = 400;
+      const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      wrapper.setAttribute("width", totalWidth);
+      wrapper.setAttribute("height", totalHeight);
+      wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
+
+      // 메모 줄마다 text 추가
+      memoLines.forEach((line, index) => {
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", "20");
+        text.setAttribute("y", memoTopOffset + (index * lineHeight));
+        text.setAttribute("font-size", "35");
+        text.setAttribute("font-weight", "bold");
+        text.setAttribute("font-family", "Sans-serif");
+        text.setAttribute("text-anchor", "start");
+        text.textContent = line;
+        wrapper.appendChild(text);
+      });
+
+      // 바코드 SVG 복사
+      const clone = barcodeSvg.cloneNode(true);
+      clone.setAttribute("x", "0");
+      clone.setAttribute("y", barcodeTopOffset);
+      wrapper.appendChild(clone);
+
+      // 저장
       const serializer = new XMLSerializer();
-      const svgData = serializer.serializeToString(svg);
+      const svgData = serializer.serializeToString(wrapper);
       const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
       const url = URL.createObjectURL(blob);
 
