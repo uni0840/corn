@@ -98,6 +98,14 @@
   </div>
 
   <script>
+    function insertLineBreaks(text, maxChars) {
+      let result = '';
+      for (let i = 0; i < text.length; i += maxChars) {
+        result += text.substr(i, maxChars) + '\n';
+      }
+      return result.trim();
+    }
+
     function generateBarcode() {
       const input = document.getElementById("barcodeInput").value.trim();
       const memo = document.getElementById("memoInput").value.trim();
@@ -128,14 +136,6 @@
       });
     }
 
-    function insertLineBreaks(text, maxChars) {
-      let result = '';
-      for (let i = 0; i < text.length; i += maxChars) {
-        result += text.substr(i, maxChars) + '\n';
-      }
-      return result.trim();
-    }
-
     function printBarcode() {
       const input = document.getElementById("barcodeInput").value.trim();
       if (!input) {
@@ -161,17 +161,17 @@
       const lineHeight = 45;
       const memoTopOffset = 45;
       const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
-      const barcodeHeight = 130; // barcode + input text
+      const barcodeHeight = 150;
       const totalHeight = barcodeTopOffset + barcodeHeight + 20;
-
       const totalWidth = 400;
+
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       wrapper.setAttribute("width", totalWidth);
       wrapper.setAttribute("height", totalHeight);
       wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
-      // 메모 줄마다 text 추가
+      // 상단 메모 줄 추가
       memoLines.forEach((line, index) => {
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("x", "20");
@@ -184,13 +184,13 @@
         wrapper.appendChild(text);
       });
 
-      // 바코드 SVG 복사
-      const clone = barcodeSvg.cloneNode(true);
-      clone.setAttribute("x", "0");
-      clone.setAttribute("y", barcodeTopOffset);
-      wrapper.appendChild(clone);
+      // 바코드 SVG 복제 및 위치 조정
+      const barcodeClone = barcodeSvg.cloneNode(true);
+      barcodeClone.setAttribute("x", "0");
+      barcodeClone.setAttribute("y", barcodeTopOffset);
+      wrapper.appendChild(barcodeClone);
 
-      // 저장
+      // SVG 저장
       const serializer = new XMLSerializer();
       const svgData = serializer.serializeToString(wrapper);
       const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
