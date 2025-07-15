@@ -90,7 +90,7 @@
       gap: 8px;
     }
     .tip-content {
-      display: block;
+      display: none; /* 기본 접힘 상태 */
       padding: 12px 16px;
       background-color: #fffde9;
       font-size: 14px;
@@ -126,39 +126,12 @@
 
   <div class="form-group">
     <label>일수</label>
-    <input type="number" id="days_only" placeholder="예: 365" />
+    <input type="number" id="days_only" placeholder="예: 365일" />
 
-    <!-- 주 + 일 항목 주석 처리 -->
-    <!--
-    <label>주 + 일</label>
-    <div class="flex-row">
-      <input type="number" id="weeks" placeholder="주" />
-      <input type="number" id="days_in_week" placeholder="일" />
-    </div>
-    -->
+    <!-- 개월 + 일, 년 + 개월 + 일 항목 주석처리됨 -->
 
-    <!-- 개월 + 일 항목 주석 처리 -->
-    <!--
-    <label>개월 + 일</label>
-    <div class="flex-row">
-      <input type="number" id="months_only" placeholder="개월" />
-      <input type="number" id="days_in_month" placeholder="일" />
-    </div>
-    -->
-
-    <!-- 년 + 개월 + 일 항목 주석 처리 -->
-    <!--
-    <label>년 + 개월 + 일</label>
-    <div class="flex-row">
-      <input type="number" id="years" placeholder="년" />
-      <input type="number" id="months" placeholder="개월" />
-      <input type="number" id="days" placeholder="일" />
-    </div>
-    -->
-
-    <!-- 개월만 입력하는 항목 -->
     <label>개월</label>
-    <input type="number" id="months_only_simple" placeholder="예: 6" />
+    <input type="number" id="months_only_simple" placeholder="예: 6개월" />
   </div>
 
   <div class="button-group">
@@ -217,12 +190,15 @@
         return;
       }
 
-      let totalDays = parseInt(document.getElementById('days_only').value) || 0;
-      let totalMonths = parseInt(document.getElementById('months_only_simple').value) || 0;
+      const months = parseInt(document.getElementById('months_only_simple').value) || 0;
+      const daysInput = parseInt(document.getElementById('days_only').value) || 0;
+
+      // 초일 산입: 기준일을 포함하므로 일수 - 1
+      const adjustedDays = daysInput > 0 ? daysInput - 1 : 0;
 
       const resultDate = new Date(baseDate);
-      resultDate.setMonth(resultDate.getMonth() + totalMonths);
-      resultDate.setDate(resultDate.getDate() + totalDays);
+      resultDate.setMonth(resultDate.getMonth() + months);
+      resultDate.setDate(resultDate.getDate() + adjustedDays);
 
       const formatted = resultDate.toISOString().split('T')[0];
       document.getElementById('result').innerText = `계산 결과: ${formatted}`;
@@ -230,11 +206,7 @@
 
     function resetInputs() {
       document.getElementById('baseDate').value = '';
-      const ids = [
-        'days_only',
-        'months_only_simple'
-      ];
-      ids.forEach(id => {
+      ['days_only', 'months_only_simple'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
@@ -243,7 +215,7 @@
 
     function toggleTip() {
       const content = document.getElementById('tipContent');
-      content.style.display = (content.style.display === 'none') ? 'block' : 'none';
+      content.style.display = (content.style.display === 'none' || content.style.display === '') ? 'block' : 'none';
     }
   </script>
 
