@@ -27,11 +27,10 @@
       width: 100%;
       box-sizing: border-box;
     }
-    .button-group {
+    .button-pair {
       display: flex;
       gap: 10px;
-      margin-top: 15px;
-      flex-wrap: wrap;
+      margin-top: 10px;
     }
     button {
       flex: 1;
@@ -48,6 +47,14 @@
       border: 2px solid skyblue;
       color: skyblue;
     }
+    .result-box {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 6px;
+    }
     #notice {
       margin-top: 20px;
       background-color: #f0f8ff;
@@ -55,14 +62,6 @@
       border-radius: 8px;
       line-height: 1.6;
       font-size: 15px;
-    }
-    #result {
-      margin-bottom: 16px;
-      font-weight: bold;
-      font-size: 16px;
-      background: #f9f9f9;
-      padding: 12px;
-      border-radius: 6px;
     }
     hr {
       margin: 20px 0;
@@ -118,19 +117,24 @@
   <hr>
 
   <div class="form-group">
-    <label>일 </label>
+    <label>일</label>
     <input type="number" id="days_only" placeholder="예: 45일" />
+    <div class="button-pair">
+      <button onclick="calculateDaysOnly()">일 수 계산</button>
+      <button class="reset" onclick="document.getElementById('days_only').value=''">리셋</button>
+    </div>
+    <div id="resultDays" class="result-box"></div>
+  </div>
 
-    <label>개월 </label>
+  <div class="form-group">
+    <label>개월</label>
     <input type="number" id="months_only_simple" placeholder="예: 6개월" />
+    <div class="button-pair">
+      <button onclick="calculateMonthsOnly()">개월 수 계산</button>
+      <button class="reset" onclick="document.getElementById('months_only_simple').value=''">리셋</button>
+    </div>
+    <div id="resultMonths" class="result-box"></div>
   </div>
-
-  <div class="button-group">
-    <button onclick="calculateDate()">계산</button>
-    <button onclick="resetInputs()" class="reset">리셋</button>
-  </div>
-
-  <div id="result"></div>
 
   <div id="notice">
     <strong>📌 사용 안내</strong><br />
@@ -174,31 +178,53 @@
       return new Date(base);
     }
 
-    function calculateDate() {
+    function calculateDaysOnly() {
       const baseDate = getBaseDate();
+      const resultDiv = document.getElementById('resultDays');
+      resultDiv.innerText = '';
+      document.getElementById('resultMonths').innerText = ''; // 다른 결과 초기화
+
       if (!baseDate) {
-        document.getElementById('result').innerText = '기준일을 선택해주세요.';
+        resultDiv.innerText = '기준일을 선택해주세요.';
         return;
       }
 
-      const days = parseInt(document.getElementById('days_only').value) || 0;
-      const months = parseInt(document.getElementById('months_only_simple').value) || 0;
+      const days = parseInt(document.getElementById('days_only').value);
+      if (!days || days <= 0) {
+        resultDiv.innerText = '일 수를 올바르게 입력해주세요.';
+        return;
+      }
+
+      const resultDate = new Date(baseDate);
+      resultDate.setDate(resultDate.getDate() + (days - 1)); // 초일 산입
+
+      const formatted = resultDate.toISOString().split('T')[0];
+      resultDiv.innerText = `계산 결과 (일 수): ${formatted}`;
+    }
+
+    function calculateMonthsOnly() {
+      const baseDate = getBaseDate();
+      const resultDiv = document.getElementById('resultMonths');
+      resultDiv.innerText = '';
+      document.getElementById('resultDays').innerText = ''; // 다른 결과 초기화
+
+      if (!baseDate) {
+        resultDiv.innerText = '기준일을 선택해주세요.';
+        return;
+      }
+
+      const months = parseInt(document.getElementById('months_only_simple').value);
+      if (!months || months <= 0) {
+        resultDiv.innerText = '개월 수를 올바르게 입력해주세요.';
+        return;
+      }
 
       const resultDate = new Date(baseDate);
       resultDate.setMonth(resultDate.getMonth() + months);
-      resultDate.setDate(resultDate.getDate() + (days > 0 || months > 0 ? days - 1 : 0)); // 초일 산입 적용
+      resultDate.setDate(resultDate.getDate() - 1); // 초일 산입
 
       const formatted = resultDate.toISOString().split('T')[0];
-      document.getElementById('result').innerText = `계산 결과: ${formatted}`;
-    }
-
-    function resetInputs() {
-      document.getElementById('baseDate').value = '';
-      ['days_only', 'months_only_simple'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.getElementById('result').innerText = '';
+      resultDiv.innerText = `계산 결과 (개월 수): ${formatted}`;
     }
 
     function toggleTip() {
