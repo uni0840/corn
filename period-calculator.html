@@ -20,13 +20,6 @@
       gap: 12px;
       margin-top: 20px;
     }
-    .flex-row {
-      display: flex;
-      gap: 10px;
-    }
-    .flex-row input {
-      flex: 1;
-    }
     input[type="number"],
     input[type="date"] {
       padding: 10px;
@@ -90,7 +83,7 @@
       gap: 8px;
     }
     .tip-content {
-      display: none; /* 기본 접힘 상태 */
+      display: none;
       padding: 12px 16px;
       background-color: #fffde9;
       font-size: 14px;
@@ -125,17 +118,15 @@
   <hr>
 
   <div class="form-group">
-    <label>일수</label>
+    <label>일 수</label>
     <input type="number" id="days_only" placeholder="예: 45일" />
-
-    <!-- 개월 + 일, 년 + 개월 + 일 항목 주석처리됨 -->
 
     <label>개월</label>
     <input type="number" id="months_only_simple" placeholder="예: 6개월" />
   </div>
 
   <div class="button-group">
-    <button onclick="calculateDate()">계산</button>
+    <button onclick="calculateDate()">정산</button>
     <button onclick="resetInputs()" class="reset">리셋</button>
   </div>
 
@@ -143,7 +134,8 @@
 
   <div id="notice">
     <strong>📌 사용 안내</strong><br />
-    이 계산기는 <strong>초일 산입 방식</strong>(기준일 포함), <strong>정산</strong>(正算)하여 계산합니다.  </div>
+    이 계산기는 <strong>초일 산입 방식</strong>(기준일 포함), <strong>정산</strong>(正算)하여 계산합니다.
+  </div>
 
   <div class="tip-container">
     <div class="tip-header" onclick="toggleTip()">
@@ -189,15 +181,12 @@
         return;
       }
 
+      const days = parseInt(document.getElementById('days_only').value) || 0;
       const months = parseInt(document.getElementById('months_only_simple').value) || 0;
-      const daysInput = parseInt(document.getElementById('days_only').value) || 0;
-
-      // 초일 산입: 기준일을 포함하므로 일수 - 1
-      const adjustedDays = daysInput > 0 ? daysInput - 1 : 0;
 
       const resultDate = new Date(baseDate);
       resultDate.setMonth(resultDate.getMonth() + months);
-      resultDate.setDate(resultDate.getDate() + adjustedDays);
+      resultDate.setDate(resultDate.getDate() + (days > 0 || months > 0 ? days - 1 : 0)); // 초일 산입 적용
 
       const formatted = resultDate.toISOString().split('T')[0];
       document.getElementById('result').innerText = `계산 결과: ${formatted}`;
