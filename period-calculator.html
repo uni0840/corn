@@ -126,16 +126,16 @@
 
   <div class="form-group">
     <label>일수</label>
-    <input type="number" id="days_only" placeholder="예: 365일" />
+    <input type="number" id="days_only" placeholder="예: 10" />
 
     <!-- 개월 + 일, 년 + 개월 + 일 항목 주석처리됨 -->
 
     <label>개월</label>
-    <input type="number" id="months_only_simple" placeholder="예: 6개월" />
+    <input type="number" id="months_only_simple" placeholder="예: 2" />
   </div>
 
   <div class="button-group">
-    <button onclick="calculateDate()">정산</button>
+    <button onclick="calculateDate()">계산</button>
     <button onclick="resetInputs()" class="reset">리셋</button>
   </div>
 
@@ -143,7 +143,8 @@
 
   <div id="notice">
     <strong>📌 사용 안내</strong><br />
-    ✔︎ 이 계산기는 기준일을 포함하여 계산합니다 (<strong>초일 산입 방식</strong>).
+    ✔︎ 이 계산기는 <strong>초일 산입 방식</strong>(기준일) 포함하고,<br />
+    ✔︎ 정산(正算)하여 계산합니다.
   </div>
 
   <div class="tip-container">
