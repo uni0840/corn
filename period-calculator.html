@@ -12,7 +12,7 @@
       margin: auto;
     }
     h2 {
-      display: none; /* 제목 주석 처리 */
+      display: none;
     }
     .form-group {
       display: flex;
@@ -74,6 +74,43 @@
     hr {
       margin: 20px 0;
     }
+    .tip-container {
+      margin-top: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tip-header {
+      background-color: #fdfcdc;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tip-content {
+      display: block;
+      padding: 12px 16px;
+      background-color: #fffde9;
+      font-size: 14px;
+    }
+    .tip-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .tip-column {
+      flex: 0 0 48%;
+    }
+    .tip-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tip-column li {
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -100,18 +137,28 @@
     </div>
     -->
 
+    <!-- 개월 + 일 항목 주석 처리 -->
+    <!--
     <label>개월 + 일</label>
     <div class="flex-row">
       <input type="number" id="months_only" placeholder="개월" />
       <input type="number" id="days_in_month" placeholder="일" />
     </div>
+    -->
 
+    <!-- 년 + 개월 + 일 항목 주석 처리 -->
+    <!--
     <label>년 + 개월 + 일</label>
     <div class="flex-row">
       <input type="number" id="years" placeholder="년" />
       <input type="number" id="months" placeholder="개월" />
       <input type="number" id="days" placeholder="일" />
     </div>
+    -->
+
+    <!-- 개월만 입력하는 항목 -->
+    <label>개월</label>
+    <input type="number" id="months_only_simple" placeholder="예: 6" />
   </div>
 
   <div class="button-group">
@@ -124,6 +171,36 @@
   <div id="notice">
     <strong>📌 사용 안내</strong><br />
     ✔︎ 이 계산기는 기준일을 포함하여 계산합니다 (<strong>초일 산입 방식</strong>).
+  </div>
+
+  <div class="tip-container">
+    <div class="tip-header" onclick="toggleTip()">
+      💡 추가 팁 (영문 월 약어 보기)
+    </div>
+    <div class="tip-content" id="tipContent">
+      <div class="tip-grid">
+        <div class="tip-column">
+          <ul>
+            <li>Jan (1월)</li>
+            <li>Feb (2월)</li>
+            <li>Mar (3월)</li>
+            <li>Apr (4월)</li>
+            <li>May (5월)</li>
+            <li>Jun (6월)</li>
+          </ul>
+        </div>
+        <div class="tip-column">
+          <ul>
+            <li>Jul (7월)</li>
+            <li>Aug (8월)</li>
+            <li>Sep (9월)</li>
+            <li>Oct (10월)</li>
+            <li>Nov (11월)</li>
+            <li>Dec (12월)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -140,19 +217,10 @@
         return;
       }
 
-      let totalYears = parseInt(document.getElementById('years').value) || 0;
-      let totalMonths = parseInt(document.getElementById('months').value) || 0;
-      let totalDays = parseInt(document.getElementById('days').value) || 0;
-
-      totalMonths += parseInt(document.getElementById('months_only').value) || 0;
-      totalDays += parseInt(document.getElementById('days_in_month').value) || 0;
-
-      // 주 + 일 항목 제거됨
-
-      totalDays += parseInt(document.getElementById('days_only').value) || 0;
+      let totalDays = parseInt(document.getElementById('days_only').value) || 0;
+      let totalMonths = parseInt(document.getElementById('months_only_simple').value) || 0;
 
       const resultDate = new Date(baseDate);
-      resultDate.setFullYear(resultDate.getFullYear() + totalYears);
       resultDate.setMonth(resultDate.getMonth() + totalMonths);
       resultDate.setDate(resultDate.getDate() + totalDays);
 
@@ -164,14 +232,18 @@
       document.getElementById('baseDate').value = '';
       const ids = [
         'days_only',
-        'months_only', 'days_in_month',
-        'years', 'months', 'days'
+        'months_only_simple'
       ];
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
       document.getElementById('result').innerText = '';
+    }
+
+    function toggleTip() {
+      const content = document.getElementById('tipContent');
+      content.style.display = (content.style.display === 'none') ? 'block' : 'none';
     }
   </script>
 
