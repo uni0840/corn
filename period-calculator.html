@@ -117,11 +117,11 @@
 
   <hr>
 
-  <!-- 전체 리셋 버튼 위치 변경됨 -->
+  <!-- 전체 리셋 버튼 (위치 이동됨) -->
   <button class="reset-all" onclick="resetAll()">전체 리셋</button>
 
   <div class="form-group">
-    <!-- <label>일</label> -->
+    <label>일</label>
     <input type="number" id="days_only" placeholder="예: 45일" />
     <div class="button-pair">
       <button onclick="calculateDaysOnly()">일 수 계산</button>
@@ -130,7 +130,7 @@
   </div>
 
   <div class="form-group">
-    <!-- <label>개월</label> -->
+    <label>개월</label>
     <input type="number" id="months_only_simple" placeholder="예: 6개월" />
     <div class="button-pair">
       <button onclick="calculateMonthsOnly()">개월 수 계산</button>
@@ -235,6 +235,7 @@
       document.getElementById('months_only_simple').value = '';
       document.getElementById('resultDays').innerText = '';
       document.getElementById('resultMonths').innerText = '';
+      document.getElementById('baseDate').focus(); // 포커스 이동
     }
 
     function toggleTip() {
