@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Period Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="date"],
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    button {
+      flex: 1;
+      background-color: skyblue;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    #notice {
+      margin-top: 25px;
+      background-color: #f0f8ff;
+      padding: 14px;
+      border-radius: 8px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>기간 계산기 (Period Calculator)</h2>
+
+  <div class="form-group">
+    <label for="baseDate">기준일</label>
+    <input type="date" id="baseDate">
+
+    <label for="years">연</label>
+    <input type="number" id="years" value="0" placeholder="0"> 
+
+    <label for="months">월</label>
+    <input type="number" id="months" value="0" placeholder="0"> 
+
+    <label for="days">일</label>
+    <input type="number" id="days" value="0" placeholder="0">
+  </div>
+
+  <div class="button-group">
+    <button onclick="calculateDate('forward')">정산</button>
+    <button onclick="calculateDate('backward')">역산</button>
+  </div>
+
+  <div id="notice">
+    <strong>📌 사용 안내</strong><br>
+    ✔︎ 정산: <strong>기준일 + 기간</strong>을 계산<br>
+    ✔︎ 역산: <strong>기준일 - 기간</strong>을 계산<br>
+    ✔︎ 이 계산기는 기준일을 포함하여 계산합니다 (<strong>초일 산입 방식</strong>).
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    function calculateDate(direction) {
+      const baseDate = new Date(document.getElementById('baseDate').value);
+      const years = parseInt(document.getElementById('years').value) || 0;
+      const months = parseInt(document.getElementById('months').value) || 0;
+      const days = parseInt(document.getElementById('days').value) || 0;
+
+      if (isNaN(baseDate.getTime())) {
+        document.getElementById('result').innerText = '기준일을 입력해주세요.';
+        return;
+      }
+
+      const calcDate = new Date(baseDate);
+
+      if (direction === 'forward') {
+        calcDate.setFullYear(calcDate.getFullYear() + years);
+        calcDate.setMonth(calcDate.getMonth() + months);
+        calcDate.setDate(calcDate.getDate() + days);
