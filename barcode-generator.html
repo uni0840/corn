@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barcode Generator</title>
-
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
   <style>
     body {
       font-family: sans-serif;
@@ -15,35 +13,62 @@
       margin: 0;
     }
 
-    textarea, input {
-      font-size: 1.2em;
-      padding: 0.5em;
+    textarea, input, #notice {
       width: min(90vw, 300px);
       box-sizing: border-box;
     }
 
+    textarea, input {
+      font-size: 1.2em;
+      padding: 0.5em;
+    }
+
     textarea {
       resize: none;
-      height: 4em;
-      font-weight: bold;
+      height: 2.5em;
+      font-weight: normal;
+    }
+
+    input#barcodeInput {
+      margin-bottom: 10px;
     }
 
     button {
-      background-color: skyblue;
-      border: 2px solid skyblue;
-      padding: 12px;
+      font-size: 1em;
+      margin: 5px auto;
+      padding: 0.6em 1.2em;
+      width: min(90vw, 300px);
+      box-sizing: border-box;
       cursor: pointer;
       border-radius: 6px;
+      display: block;
+    }
+
+    button#printBtn {
+      background-color: skyblue;
+      border: 2px solid skyblue;
       color: white;
-      font-size: 1em;
-      margin: 10px;
-      padding: 0.6em 1.2em;
-      width: min(100vw, 130px);
+    }
+
+    button#resetBtn {
+      background-color: transparent;
+      border: 2px solid skyblue;
+      color: skyblue;
+    }
+
+    #notice {
+      background-color: #f0f8ff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      margin: 0 auto 20px auto;
+      line-height: 1.6;
     }
 
     #printArea {
       text-align: center;
       margin-top: 3cm;
+      cursor: pointer;
     }
 
     #barcode {
@@ -83,22 +108,25 @@
         font-size: 35px !important;
       }
 
-      textarea, input, button {
+      textarea, input, button, #notice {
         display: none;
       }
     }
   </style>
 </head>
-
 <body>
-  <textarea id="memoInput" placeholder="(선택) 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
-  <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
-  <div>
-    <button onclick="printBarcode()">프린트</button>
-    <button onclick="saveAsSvg()">파일 저장</button>
+  <div id="notice">
+    입력값이 반영된 결과물은 </br>
+    <strong>🖼 클릭 시 파일로 저장됩니다.</strong>
   </div>
 
-  <div id="printArea">
+  <textarea id="memoInput" placeholder="(선택) 바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
+  <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
+
+  <button id="printBtn" onclick="printBarcode()">프린트</button>
+  <button id="resetBtn" onclick="resetFields()">리셋</button>
+
+  <div id="printArea" onclick="saveAsSvg()">
     <div id="memoDisplay"></div>
     <svg id="barcode"></svg>
   </div>
@@ -151,6 +179,13 @@
       window.print();
     }
 
+    function resetFields() {
+      document.getElementById("memoInput").value = "";
+      document.getElementById("barcodeInput").value = "";
+      document.getElementById("barcode").innerHTML = "";
+      document.getElementById("memoDisplay").innerHTML = "";
+    }
+
     function saveAsSvg() {
       const input = document.getElementById("barcodeInput").value.trim();
       const rawMemo = document.getElementById("memoInput").value.trim();
@@ -177,7 +212,6 @@
       wrapper.setAttribute("height", totalHeight);
       wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
-      // 상단 메모 줄 추가
       memoLines.forEach((line, index) => {
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("x", "20");
@@ -190,13 +224,11 @@
         wrapper.appendChild(text);
       });
 
-      // 바코드 SVG 복제 및 위치 조정
       const barcodeClone = barcodeSvg.cloneNode(true);
       barcodeClone.setAttribute("x", "0");
       barcodeClone.setAttribute("y", barcodeTopOffset);
       wrapper.appendChild(barcodeClone);
 
-      // SVG 저장
       const serializer = new XMLSerializer();
       const svgData = serializer.serializeToString(wrapper);
       const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
