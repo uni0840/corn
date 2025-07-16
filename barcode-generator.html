@@ -33,24 +33,30 @@
       margin-bottom: 10px;
     }
 
-    button {
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px auto;
+      max-width: min(90vw, 300px);
+    }
+
+    .button-group button {
       font-size: 1em;
-      margin: 5px auto;
       padding: 0.6em 1.2em;
-      width: min(90vw, 300px);
+      width: min(90vw, 120px);
       box-sizing: border-box;
       cursor: pointer;
       border-radius: 6px;
-      display: block;
     }
 
-    button#printBtn {
+    #printBtn {
       background-color: skyblue;
       border: 2px solid skyblue;
       color: white;
     }
 
-    button#resetBtn {
+    #resetBtn {
       background-color: transparent;
       border: 2px solid skyblue;
       color: skyblue;
@@ -123,8 +129,10 @@
   <textarea id="memoInput" placeholder="(선택) 바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
   <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
 
-  <button id="printBtn" onclick="printBarcode()">프린트</button>
-  <button id="resetBtn" onclick="resetFields()">리셋</button>
+  <div class="button-group">
+    <button id="printBtn" onclick="printBarcode()">프린트</button>
+    <button id="resetBtn" onclick="resetFields()">리셋</button>
+  </div>
 
   <div id="printArea" onclick="saveAsSvg()">
     <div id="memoDisplay"></div>
