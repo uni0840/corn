@@ -27,13 +27,17 @@
       width: 100%;
       box-sizing: border-box;
     }
-    .button-pair {
+    .input-row {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
+    }
+    .input-row input {
+      flex: 7;
+    }
+    .input-row button {
+      flex: 3;
     }
     button {
-      flex: 1;
       background-color: skyblue;
       border: none;
       padding: 12px;
@@ -109,6 +113,7 @@
 <body>
 
   <!-- <h2>기간 계산기 (Period Calculator)</h2> -->
+
   <div class="form-group">
     <label><strong>기준일(달력형)</strong></label>
     <input type="date" id="baseDate">
@@ -116,13 +121,12 @@
 
   <hr>
 
-  <!-- 전체 리셋 버튼 (위치 이동됨) -->
   <button class="reset-all" onclick="resetAll()">전체 리셋</button>
 
   <div class="form-group">
     <!-- <label>일</label> -->
-    <input type="number" id="days_only" placeholder="예: 45일" />
-    <div class="button-pair">
+    <div class="input-row">
+      <input type="number" id="days_only" placeholder="예: 45일" />
       <button onclick="calculateDaysOnly()">일 수 계산</button>
     </div>
     <div id="resultDays" class="result-box"></div>
@@ -130,8 +134,8 @@
 
   <div class="form-group">
     <!-- <label>개월</label> -->
-    <input type="number" id="months_only_simple" placeholder="예: 36개월" />
-    <div class="button-pair">
+    <div class="input-row">
+      <input type="number" id="months_only_simple" placeholder="예: 6개월" />
       <button onclick="calculateMonthsOnly()">개월 수 계산</button>
     </div>
     <div id="resultMonths" class="result-box"></div>
@@ -144,28 +148,28 @@
 
   <div class="tip-container">
     <div class="tip-header" onclick="toggleTip()">
-      💡 추가 팁(영문 월 약어 보기)
+      💡 추가 팁(영문 월 약어)
     </div>
     <div class="tip-content" id="tipContent">
       <div class="tip-grid">
         <div class="tip-column">
           <ul>
-            <li>Jan (1월)</li>
-            <li>Feb (2월)</li>
-            <li>Mar (3월)</li>
-            <li>Apr (4월)</li>
-            <li>May (5월)</li>
-            <li>Jun (6월)</li>
+            <li>Jan (1월) / A</li>
+            <li>Feb (2월) / B</li>
+            <li>Mar (3월) / C</li>
+            <li>Apr (4월) / D</li>
+            <li>May (5월) / E</li>
+            <li>Jun (6월) / F</li>
           </ul>
         </div>
         <div class="tip-column">
           <ul>
-            <li>Jul (7월)</li>
-            <li>Aug (8월)</li>
-            <li>Sep (9월)</li>
-            <li>Oct (10월)</li>
-            <li>Nov (11월)</li>
-            <li>Dec (12월)</li>
+            <li>Jul (7월)  / G</li>
+            <li>Aug (8월)  / H</li>
+            <li>Sep (9월)  / I</li>
+            <li>Oct (10월) / J</li>
+            <li>Nov (11월) / K</li>
+            <li>Dec (12월) / L</li>
           </ul>
         </div>
       </div>
@@ -234,7 +238,7 @@
       document.getElementById('months_only_simple').value = '';
       document.getElementById('resultDays').innerText = '';
       document.getElementById('resultMonths').innerText = '';
-      document.getElementById('baseDate').focus(); // 포커스 이동
+      document.getElementById('baseDate').focus(); // 기준일로 포커스
     }
 
     function toggleTip() {
