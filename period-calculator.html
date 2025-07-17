@@ -143,9 +143,8 @@
 
   <div id="notice">
     <strong>📌 사용 안내</strong><br />
-    • 이 계산기는 <strong>초일 산입</strong>(기준일 포함), <strong>정산</strong>(正算)하여 계산합니다.</br>
-    • 일 수와 개월 수는 합산이 아닌 개별 계산됩니다.</br>
-    • 계산 방식을 변경하는 경우 <strong>'전체 리셋' 버튼을 눌러 기준일을 변경</strong>하십시오.
+    • 계산 방식 변경 시 <strong>'전체 리셋' 버튼</strong>으로 <strong>기준일을 변경</strong>하십시오.<br />
+    • 이 계산기는 초일 산입(기준일 포함), 정산(正算)하여 계산합니다.
   </div>
 
   <div class="tip-container">
@@ -248,6 +247,19 @@
       content.style.display = (content.style.display === 'none' || content.style.display === '') ? 'block' : 'none';
     }
   </script>
-
+  <script>
+  // 연도는 4자리까지만 입력되도록 처리
+  document.getElementById('baseDate').addEventListener('input', function (e) {
+    const val = e.target.value;
+    if (val && /^\d{5,}/.test(val)) {
+      // 사용자가 직접 5자리 이상 연도 입력 시 잘라줌
+      const parts = val.split('-');
+      if (parts[0].length > 4) {
+        parts[0] = parts[0].slice(0, 4);
+        e.target.value = parts.join('-');
+      }
+    }
+  });
+</script>
 </body>
 </html>
