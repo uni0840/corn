@@ -73,13 +73,13 @@
 
     #printArea {
       text-align: center;
-      margin-top: 3cm;
+      margin-top: 2.5cm;
       cursor: pointer;
     }
 
     #barcode {
-      width: 300px;
-      height: 150px;
+      width: 280px;
+      height: 120px;
       display: block;
       margin: 0 auto;
     }
@@ -103,11 +103,11 @@
 
       #printArea {
         position: absolute;
-        top: 3cm;
+        top: 2.5cm;
         left: 1cm;
         margin: 0;
         padding: 0;
-        width: 93mm; /* A6 가로 105mm - 좌우 여백 1cm씩 */
+        width: 70mm; /* A6 세로 인쇄 시 최대 안전 너비 */
       }
 
       #memoDisplay {
@@ -130,7 +130,7 @@
   </div>
 
   <div id="notice">
-    <strong>⬇️ 클릭하면 파일로 저장</strong>
+    <strong>🖼 클릭하면 파일로 저장</strong>
   </div>
 
   <div id="printArea" onclick="saveAsSvg()">
@@ -165,12 +165,12 @@
       JsBarcode(barcode, input, {
         format: "CODE128",
         lineColor: "#000",
-        width: 2,
-        height: 100,
+        width: 1.5,
+        height: 80,
         margin: 10,
         displayValue: true,
-        fontSize: 25,
-        textMargin: 13,
+        fontSize: 20,
+        textMargin: 10,
         fontOptions: "bold",
         font: "Sans-serif",
         fit: false
@@ -209,9 +209,9 @@
       const lineHeight = 45;
       const memoTopOffset = 45;
       const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
-      const barcodeHeight = 150;
+      const barcodeHeight = 120;
       const totalHeight = barcodeTopOffset + barcodeHeight + 20;
-      const totalWidth = 400;
+      const totalWidth = 300;
 
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
