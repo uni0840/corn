@@ -67,7 +67,7 @@
       padding: 12px;
       border-radius: 8px;
       font-size: 15px;
-      margin: 20px auto;
+      margin: 0 auto 20px auto;
       line-height: 1.6;
     }
 
@@ -103,11 +103,11 @@
 
       #printArea {
         position: absolute;
-        top: 3cm;
-        left: 1cm;
+        top: 0;
+        left: 0;
         margin: 0;
         padding: 0;
-        width: 93mm; /* A6 가로 105mm - 좌우 여백 1cm씩 */
+        width: 93mm;
       }
 
       #memoDisplay {
@@ -121,16 +121,16 @@
   </style>
 </head>
 <body>
-  <textarea id="memoInput" placeholder="(선택)바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
+  <div id="notice">
+    바코드 이미지 클릭 시 파일로 저장됩니다.</strong>
+  </div>
+
+  <textarea id="memoInput" placeholder="(선택) 바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
   <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
 
   <div class="button-group">
     <button id="printBtn" onclick="printBarcode()">프린트</button>
     <button id="resetBtn" onclick="resetFields()">리셋</button>
-  </div>
-
-  <div id="notice">
-    <strong>⬇️ 클릭하면 파일로 저장</strong>
   </div>
 
   <div id="printArea" onclick="saveAsSvg()">
