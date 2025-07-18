@@ -44,7 +44,7 @@
     .button-group button {
       font-size: 1em;
       padding: 0.6em 1.2em;
-      width: min(90vw, 120px);
+      width: min(90vw, 150px);
       box-sizing: border-box;
       cursor: pointer;
       border-radius: 6px;
@@ -69,6 +69,8 @@
       font-size: 15px;
       margin: 20px auto;
       line-height: 1.6;
+      text-align: center;
+
     }
 
     #printArea {
@@ -131,7 +133,7 @@
   </div>
 
   <div id="notice">
-    <strong> ⬇️ 클릭하면 파일로 저장됩니다. ⬇️ </strong>
+    <strong> ⬇️ 클릭하면 파일 다운로드 ⬇️ </strong>
   </div>
 
   <div id="printArea" onclick="saveAsSvg()">
@@ -250,8 +252,6 @@
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }
-
-    window.onload = generateBarcode;
   </script>
 </body>
 </html>
