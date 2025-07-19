@@ -63,14 +63,14 @@
     }
 
     #notice {
-      background-color: #f0f8ff;
+      background-color: skyblue;
       padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      margin: 20px auto;
-      line-height: 1.6;
-      text-align: center;
-      color: #2B547E;
+      border-radius: 22px;
+      font-size: 12px;
+      margin: 10px auto;
+      line-height: 1;
+      text-align: left;
+      color: white;
     }
 
     #printArea {
@@ -84,6 +84,9 @@
       height: 150px;
       display: block;
       margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     #memoDisplay {
@@ -109,7 +112,7 @@
         left: 0;
         margin: 0;
         padding: 0;
-        width: 93mm;
+        width: 90mm; /* 좌우 1.5cm 여백 확보 */
       }
 
       #memoDisplay {
@@ -131,13 +134,14 @@
     <button id="printBtn" onclick="printBarcode()">프린트</button>
     <button id="resetBtn" onclick="resetFields()">리셋</button>
   </div>
-  <!-- <div id="notice">
-    <strong> ⬇️ 클릭, 파일 다운로드 ⬇️ </strong>
-  </div> -->
 
+  <div id="notice">
+    ✦ 프린트 기능은 바코드 인식 확인 후 사용을 권장합니다.
+  </div>
+  
   <div id="printArea" onclick="saveAsSvg()">
     <div id="memoDisplay"></div>
-    <svg id="barcode"></svg>
+    <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
   </div>
 
   <script>
@@ -251,6 +255,8 @@
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }
+
+    window.onload = generateBarcode;
   </script>
 </body>
 </html>
