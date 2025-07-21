@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barcode Generator - BIXOLON</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+      margin: 0;
+    }
+
+    textarea, input, #notice {
+      width: min(90vw, 300px);
+      box-sizing: border-box;
+    }
+
+    textarea, input {
+      font-size: 1.2em;
+      padding: 0.5em;
+    }
+
+    textarea {
+      resize: none;
+      height: 2.5em;
+      font-weight: normal;
+    }
+
+    input#barcodeInput {
+      margin-bottom: 10px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px auto;
+      max-width: min(90vw, 300px);
+    }
+
+    .button-group button {
+      font-size: 1em;
+      padding: 0.6em 1.2em;
+      width: min(90vw, 150px);
+      box-sizing: border-box;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    #printBtn {
+      background-color: skyblue;
+      border: 2px solid skyblue;
+      color: white;
+    }
+
+    #resetBtn {
+      background-color: transparent;
+      border: 2px solid skyblue;
+      color: skyblue;
+    }
+
+    #notice {
+      background-color: white;
+      padding: 12px;
+      border-radius: 22px;
+      font-size: 12px;
+      margin: 10px auto;
+      line-height: 1;
+      text-align: left;
+      color: skyblue;
+    }
+
+    #printArea {
+      text-align: center;
+      margin-top: 3cm;
+      cursor: pointer;
+    }
+
+    #barcode {
+      width: 300px;
+      height: 150px;
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    #memoDisplay {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media print {
+      @page {
+        size: A6 portrait; /* 세로 출력 */
+        margin: 3cm 1.5cm 1.5cm 1.5cm;
+      }
+
+      body * {
+        visibility: hidden;
+      }
+
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+
+      #printArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        width: 90mm;
+      }
+
+      #memoDisplay {
+        font-size: 35px !important;
+      }
+
+      textarea, input, button, #notice {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <textarea id="memoInput" placeholder="(선택) 바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
+  <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
+
+  <div class="button-group">
+    <button id="printBtn" onclick="printBarcode()">프린트</button>
+    <button id="resetBtn" onclick="resetFields()">리셋</button>
+  </div>
+
+  <div id="notice">
+    ❐ 프린트: 바코드 인식 확인 후 사용 권장
+  </div>
+  
+  <div id="printArea" onclick="saveAsSvg()">
+    <div id="memoDisplay"></div>
+    <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+
+  <script>
+    function insertLineBreaks(text, maxChars) {
+      let result = '';
+      for (let i = 0; i < text.length; i += maxChars) {
+        result += text.substr(i, maxChars) + '\n';
+      }
+      return result.trim();
+    }
+
+    function generateBarcode() {
+      const input = document.getElementById("barcodeInput").value.trim();
+      const memo = document.getElementById("memoInput").value.trim();
+      const barcode = document.getElementById("barcode");
+      const memoDisplay = document.getElementById("memoDisplay");
+
+      barcode.innerHTML = "";
+      memoDisplay.innerHTML = "";
+
+      if (memo) {
+        memoDisplay.textContent = insertLineBreaks(memo, 14);
+      }
+
+      if (!input) return;
+
+      JsBarcode(barcode, input, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 100,
+        margin: 10,
+        displayValue: true,
+        fontSize: 25,
+        textMargin: 13,
+        fontOptions: "bold",
+        font: "Sans-serif",
+        fit: false
+      });
+    }
+
+    function printBarcode() {
+      const input = document.getElementById("barcodeInput").value.trim();
+      if (!input) {
+        alert("바코드 내용을 입력해주세요!");
+        return;
+      }
+      window.print();
+    }
+
+    function resetFields() {
+      document.getElementById("memoInput").value = "";
+      document.getElementById("barcodeInput").value = "";
+      document.getElementById("barcode").innerHTML = "";
+      document.getElementById("memoDisplay").innerHTML = "";
+    }
+
+    function saveAsSvg() {
+      const input = document.getElementById("barcodeInput").value.trim();
+      const rawMemo = document.getElementById("memoInput").value.trim();
+      const barcodeSvg = document.getElementById("barcode");
+
+      if (!input) {
+        alert("저장할 바코드 값을 입력해주세요!");
+        return;
+      }
+
+      const maxCharsPerLine = 14;
+      const memoLines = insertLineBreaks(rawMemo, maxCharsPerLine).split("\n");
+
+      const lineHeight = 45;
+      const memoTopOffset = 45;
+      const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
+      const barcodeHeight = 150;
+      const totalHeight = barcodeTopOffset + barcodeHeight + 20;
+      const totalWidth = 400;
+
+      const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      wrapper.setAttribute("width", totalWidth);
+      wrapper.setAttribute("height", totalHeight);
+      wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
+
+      memoLines.forEach((line, index) => {
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", "20");
+        text.setAttribute("y", memoTopOffset + (index * lineHeight));
+        text.setAttribute("font-size", "35");
+        text.setAttribute("font-weight", "bold");
+        text.setAttribute("font-family", "Sans-serif");
+        text.setAttribute("text-anchor", "start");
+        text.textContent = line;
+        wrapper.appendChild(text);
+      });
+
+      const barcodeClone = barcodeSvg.cloneNode(true);
+      barcodeClone.setAttribute("x", "0");
+      barcodeClone.setAttribute("y", barcodeTopOffset);
+      wrapper.appendChild(barcodeClone);
+
+      const serializer = new XMLSerializer();
+      const svgData = serializer.serializeToString(wrapper);
+      const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${input}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = generateBarcode;
+  </script>
+</body>
+</html>
