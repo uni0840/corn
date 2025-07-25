@@ -81,10 +81,17 @@
       margin: auto;
     }
 
+    #valueDisplay {
+      font-size: 22px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
     #memoDisplay {
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
       white-space: pre-wrap;
       word-break: break-word;
     }
@@ -109,6 +116,7 @@
 
       #memoDisplay {
         font-size: 35px !important;
+        padding-top: 10px;
       }
 
       textarea, input, button, #notice {
@@ -132,8 +140,9 @@
   </div>
 
   <div id="printArea" onclick="saveAsSvg()">
-    <div id="memoDisplay"></div>
     <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="valueDisplay"></div>
+    <div id="memoDisplay"></div>
   </div>
 
   <script>
@@ -150,13 +159,11 @@
       const memo = document.getElementById("memoInput").value.trim();
       const barcode = document.getElementById("barcode");
       const memoDisplay = document.getElementById("memoDisplay");
+      const valueDisplay = document.getElementById("valueDisplay");
 
       barcode.innerHTML = "";
       memoDisplay.innerHTML = "";
-
-      if (memo) {
-        memoDisplay.textContent = insertLineBreaks(memo, 14);
-      }
+      valueDisplay.innerHTML = "";
 
       if (!input) return;
 
@@ -166,13 +173,15 @@
         width: 2,
         height: 100,
         margin: 10,
-        displayValue: true,
-        fontSize: 25,
-        textMargin: 13,
-        fontOptions: "bold",
-        font: "Sans-serif",
+        displayValue: false,
         fit: false
       });
+
+      valueDisplay.textContent = input;
+
+      if (memo) {
+        memoDisplay.textContent = insertLineBreaks(memo, 14);
+      }
     }
 
     function printBarcode() {
@@ -189,6 +198,7 @@
       document.getElementById("barcodeInput").value = "";
       document.getElementById("barcode").innerHTML = "";
       document.getElementById("memoDisplay").innerHTML = "";
+      document.getElementById("valueDisplay").innerHTML = "";
     }
 
     function saveAsSvg() {
@@ -205,10 +215,12 @@
       const memoLines = insertLineBreaks(rawMemo, maxCharsPerLine).split("\n");
 
       const lineHeight = 45;
-      const memoTopOffset = 45;
-      const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
-      const barcodeHeight = 150;
-      const totalHeight = barcodeTopOffset + barcodeHeight + 20;
+      const barcodeY = 0;
+      const barcodeHeight = 100;
+      const textGap = 35;
+      const valueTextY = barcodeY + barcodeHeight + textGap;
+      const memoTextStartY = valueTextY + textGap;
+      const totalHeight = memoTextStartY + memoLines.length * lineHeight + 20;
       const totalWidth = 400;
 
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -217,10 +229,25 @@
       wrapper.setAttribute("height", totalHeight);
       wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
+      const barcodeClone = barcodeSvg.cloneNode(true);
+      barcodeClone.setAttribute("x", "105");
+      barcodeClone.setAttribute("y", barcodeY);
+      wrapper.appendChild(barcodeClone);
+
+      const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      valueText.setAttribute("x", "200");
+      valueText.setAttribute("y", valueTextY);
+      valueText.setAttribute("font-size", "25");
+      valueText.setAttribute("text-anchor", "middle");
+      valueText.setAttribute("font-family", "Sans-serif");
+      valueText.setAttribute("font-weight", "bold");
+      valueText.textContent = input;
+      wrapper.appendChild(valueText);
+
       memoLines.forEach((line, index) => {
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("x", "200");
-        text.setAttribute("y", memoTopOffset + (index * lineHeight));
+        text.setAttribute("y", memoTextStartY + (index * lineHeight));
         text.setAttribute("font-size", "35");
         text.setAttribute("font-weight", "bold");
         text.setAttribute("font-family", "Sans-serif");
@@ -228,11 +255,6 @@
         text.textContent = line;
         wrapper.appendChild(text);
       });
-
-      const barcodeClone = barcodeSvg.cloneNode(true);
-      barcodeClone.setAttribute("x", "105");
-      barcodeClone.setAttribute("y", barcodeTopOffset);
-      wrapper.appendChild(barcodeClone);
 
       const serializer = new XMLSerializer();
       const svgData = serializer.serializeToString(wrapper);
