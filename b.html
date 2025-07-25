@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barcode Generator (b.html)</title>
+  <title>Barcode Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
@@ -36,10 +36,9 @@
     .button-group {
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 10px;
       margin: 10px auto;
-      max-width: min(90vw, 320px);
+      max-width: min(90vw, 300px);
     }
 
     .button-group button {
@@ -57,12 +56,6 @@
       color: white;
     }
 
-    #previewBtn {
-      background-color: white;
-      border: 2px solid skyblue;
-      color: skyblue;
-    }
-
     #resetBtn {
       background-color: transparent;
       border: 2px solid skyblue;
@@ -71,45 +64,39 @@
 
     #notice {
       background-color: white;
+      color: skyblue;
       padding: 12px;
       border-radius: 22px;
       font-size: 12px;
       margin: 10px auto;
       line-height: 1;
       text-align: left;
-      color: skyblue;
     }
 
     #printArea {
       text-align: center;
-      margin-top: 0.5cm;
+      margin-top: 3cm;
       cursor: pointer;
     }
 
     #barcode {
-      width: 300px;
-      height: 150px;
+      width: 280px;
+      height: 100px;
       display: block;
       margin: 0 auto;
-      max-width: 100%;
-      max-height: 100%;
+      max-width: 95mm;
       object-fit: contain;
     }
 
     #memoDisplay {
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-top: 15px;
       white-space: pre-wrap;
       word-break: break-word;
     }
 
-    @media print {
-      @page {
-        size: 102mm 148mm;
-        margin: 0.5cm 1cm 1cm 1cm; /* top right bottom left */
-      }
-
+    /* @media print {
       body * {
         visibility: hidden;
       }
@@ -118,13 +105,18 @@
         visibility: visible;
       }
 
+      @page {
+        size: 101.6mm 152.4mm;
+        margin: 0.5cm 1cm 1cm 1cm;
+      }
+
       #printArea {
         position: absolute;
         top: 0;
         left: 0;
         margin: 0;
         padding: 0;
-        width: 100%;
+        width: 93mm;
       }
 
       #memoDisplay {
@@ -134,27 +126,26 @@
       textarea, input, button, #notice {
         display: none;
       }
-    }
+    } */
   </style>
 </head>
 <body>
 
-  <textarea id="memoInput" placeholder="(선택) 바코드 상단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
+  <textarea id="memoInput" placeholder="(선택) 바코드 하단 메모 입력" oninput="generateBarcode()"></textarea><br /><br />
   <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
 
   <div class="button-group">
     <button id="printBtn" onclick="printBarcode()">프린트</button>
-    <button id="previewBtn" onclick="previewPrint()">미리보기</button>
     <button id="resetBtn" onclick="resetFields()">리셋</button>
   </div>
 
   <div id="notice">
     ❐ 프린트: 바코드 인식 확인 후 사용 권장
   </div>
-
+  
   <div id="printArea" onclick="saveAsSvg()">
-    <div id="memoDisplay"></div>
     <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="memoDisplay"></div>
   </div>
 
   <script>
@@ -175,10 +166,6 @@
       barcode.innerHTML = "";
       memoDisplay.innerHTML = "";
 
-      if (memo) {
-        memoDisplay.textContent = insertLineBreaks(memo, 14);
-      }
-
       if (!input) return;
 
       JsBarcode(barcode, input, {
@@ -194,6 +181,10 @@
         font: "Sans-serif",
         fit: false
       });
+
+      if (memo) {
+        memoDisplay.textContent = insertLineBreaks(memo, 14);
+      }
     }
 
     function printBarcode() {
@@ -203,15 +194,6 @@
         return;
       }
       window.print();
-    }
-
-    function previewPrint() {
-      const input = document.getElementById("barcodeInput").value.trim();
-      if (!input) {
-        alert("바코드 내용을 입력해주세요!");
-        return;
-      }
-      window.print(); // 현재는 프린트 미리보기 실행
     }
 
     function resetFields() {
@@ -237,9 +219,9 @@
       const lineHeight = 45;
       const memoTopOffset = 45;
       const barcodeTopOffset = memoTopOffset + (memoLines.length * lineHeight);
-      const barcodeHeight = 150;
+      const barcodeHeight = 100;
       const totalHeight = barcodeTopOffset + barcodeHeight + 20;
-      const totalWidth = 400;
+      const totalWidth = 380;
 
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -247,10 +229,15 @@
       wrapper.setAttribute("height", totalHeight);
       wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
+      const barcodeClone = barcodeSvg.cloneNode(true);
+      barcodeClone.setAttribute("x", "0");
+      barcodeClone.setAttribute("y", "0");
+      wrapper.appendChild(barcodeClone);
+
       memoLines.forEach((line, index) => {
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("x", "20");
-        text.setAttribute("y", memoTopOffset + (index * lineHeight));
+        text.setAttribute("y", barcodeHeight + memoTopOffset + (index * lineHeight));
         text.setAttribute("font-size", "35");
         text.setAttribute("font-weight", "bold");
         text.setAttribute("font-family", "Sans-serif");
@@ -258,11 +245,6 @@
         text.textContent = line;
         wrapper.appendChild(text);
       });
-
-      const barcodeClone = barcodeSvg.cloneNode(true);
-      barcodeClone.setAttribute("x", "0");
-      barcodeClone.setAttribute("y", barcodeTopOffset);
-      wrapper.appendChild(barcodeClone);
 
       const serializer = new XMLSerializer();
       const svgData = serializer.serializeToString(wrapper);
