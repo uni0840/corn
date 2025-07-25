@@ -13,21 +13,21 @@
       margin: 0;
     }
 
-    textarea, input, #notice {
+    input, textarea, #notice {
       width: min(90vw, 300px);
       box-sizing: border-box;
     }
 
-    textarea, input {
+    input, textarea {
       font-size: 1.2em;
       padding: 0.5em;
+      margin-bottom: 10px;
     }
 
     textarea {
       resize: none;
       height: 2.5em;
       font-weight: normal;
-      margin-top: 10px;
     }
 
     .button-group {
@@ -61,18 +61,17 @@
 
     #notice {
       background-color: white;
+      color: skyblue;
       padding: 12px;
       border-radius: 22px;
       font-size: 12px;
       margin: 10px auto;
       line-height: 1;
       text-align: left;
-      color: skyblue;
     }
 
     #printArea {
       text-align: center;
-      margin-top: 3cm;
       cursor: pointer;
     }
 
@@ -86,16 +85,17 @@
     #memoDisplay {
       font-size: 24px;
       font-weight: bold;
-      margin-top: 10px;
+      margin: 10px auto;
       white-space: pre-wrap;
       word-break: break-word;
+      text-align: center;
+      width: 100%;
     }
   </style>
 </head>
 <body>
 
   <input id="barcodeInput" placeholder="바코드 입력" oninput="generateBarcode()" />
-  <br>
   <textarea id="memoInput" placeholder="(선택) 바코드 하단 메모 입력" oninput="generateBarcode()"></textarea>
 
   <div class="button-group">
@@ -106,7 +106,7 @@
   <div id="notice">
     ❐ 프린트: 바코드 인식 확인 후 사용 권장
   </div>
-  
+
   <div id="printArea" onclick="saveAsSvg()">
     <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="memoDisplay"></div>
@@ -130,6 +130,10 @@
       barcode.innerHTML = "";
       memoDisplay.innerHTML = "";
 
+      if (memo) {
+        memoDisplay.textContent = insertLineBreaks(memo, 14);
+      }
+
       if (!input) return;
 
       JsBarcode(barcode, input, {
@@ -145,10 +149,6 @@
         font: "Sans-serif",
         fit: false
       });
-
-      if (memo) {
-        memoDisplay.textContent = insertLineBreaks(memo, 14);
-      }
     }
 
     function printBarcode() {
@@ -158,20 +158,37 @@
         return;
       }
 
-      const printWindow = window.open('', '_blank');
-      const content = document.getElementById("printArea").innerHTML;
-      const style = `
-        <style>
-          body { margin: 0; text-align: center; }
-          #barcode { width: 227px; height: auto; display: block; margin: auto; }
-          #memoDisplay { font-size: 35px; font-weight: bold; margin-top: 20px; white-space: pre-wrap; word-break: break-word; }
-        </style>
-      `;
-      printWindow.document.write(`<html><head><title>Print</title>${style}</head><body>${content}</body></html>`);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
+      const printContents = document.getElementById("printArea").innerHTML;
+      const win = window.open('', '', 'width=600,height=400');
+      win.document.write(`
+        <html>
+        <head>
+          <title>바코드 출력</title>
+          <style>
+            body { margin: 0; padding: 0; text-align: center; }
+            #barcode {
+              width: 189px;
+              height: auto;
+              display: block;
+              margin: auto;
+            }
+            #memoDisplay {
+              font-size: 35px;
+              font-weight: bold;
+              margin-top: 20px;
+              white-space: pre-wrap;
+              word-break: break-word;
+              text-align: center;
+            }
+          </style>
+        </head>
+        <body>${printContents}</body>
+        </html>
+      `);
+      win.document.close();
+      win.focus();
+      win.print();
+      win.close();
     }
 
     function resetFields() {
@@ -196,10 +213,10 @@
 
       const lineHeight = 45;
       const memoTopOffset = 45;
-      const barcodeTopOffset = memoTopOffset;
-      const memoOffset = barcodeTopOffset + 150 + 20;
-      const totalHeight = memoOffset + (memoLines.length * lineHeight);
-      const totalWidth = 400;
+      const barcodeTopOffset = 0;
+      const barcodeHeight = 100;
+      const totalHeight = barcodeHeight + (memoLines.length * lineHeight) + 50;
+      const totalWidth = 189;
 
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -214,12 +231,12 @@
 
       memoLines.forEach((line, index) => {
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "20");
-        text.setAttribute("y", memoOffset + (index * lineHeight));
+        text.setAttribute("x", totalWidth / 2);
+        text.setAttribute("y", barcodeHeight + (index * lineHeight) + 35);
         text.setAttribute("font-size", "35");
         text.setAttribute("font-weight", "bold");
         text.setAttribute("font-family", "Sans-serif");
-        text.setAttribute("text-anchor", "start");
+        text.setAttribute("text-anchor", "middle");
         text.textContent = line;
         wrapper.appendChild(text);
       });
