@@ -71,7 +71,6 @@
     #printArea {
       text-align: center;
       margin-top: 0;
-      cursor: pointer;
     }
 
     #barcode {
@@ -139,7 +138,7 @@
     ❐ 프린트: 바코드 인식 확인 후 사용 권장
   </div>
 
-  <div id="printArea" onclick="saveAsSvg()">
+  <div id="printArea">
     <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="valueDisplay"></div>
     <div id="memoDisplay"></div>
@@ -199,75 +198,6 @@
       document.getElementById("barcode").innerHTML = "";
       document.getElementById("memoDisplay").innerHTML = "";
       document.getElementById("valueDisplay").innerHTML = "";
-    }
-
-    function saveAsSvg() {
-      const input = document.getElementById("barcodeInput").value.trim();
-      const rawMemo = document.getElementById("memoInput").value.trim();
-      const barcodeSvg = document.getElementById("barcode");
-
-      if (!input) {
-        alert("저장할 바코드 값을 입력해주세요!");
-        return;
-      }
-
-      const maxCharsPerLine = 14;
-      const memoLines = insertLineBreaks(rawMemo, maxCharsPerLine).split("\n");
-
-      const lineHeight = 45;
-      const barcodeY = 0;
-      const barcodeHeight = 100;
-      const textGap = 35;
-      const valueTextY = barcodeY + barcodeHeight + textGap;
-      const memoTextStartY = valueTextY + textGap;
-      const totalHeight = memoTextStartY + memoLines.length * lineHeight + 20;
-      const totalWidth = 400;
-
-      const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      wrapper.setAttribute("width", totalWidth);
-      wrapper.setAttribute("height", totalHeight);
-      wrapper.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
-
-      const barcodeClone = barcodeSvg.cloneNode(true);
-      barcodeClone.setAttribute("x", "105");
-      barcodeClone.setAttribute("y", barcodeY);
-      wrapper.appendChild(barcodeClone);
-
-      const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      valueText.setAttribute("x", "200");
-      valueText.setAttribute("y", valueTextY);
-      valueText.setAttribute("font-size", "25");
-      valueText.setAttribute("text-anchor", "middle");
-      valueText.setAttribute("font-family", "Sans-serif");
-      valueText.setAttribute("font-weight", "bold");
-      valueText.textContent = input;
-      wrapper.appendChild(valueText);
-
-      memoLines.forEach((line, index) => {
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "200");
-        text.setAttribute("y", memoTextStartY + (index * lineHeight));
-        text.setAttribute("font-size", "35");
-        text.setAttribute("font-weight", "bold");
-        text.setAttribute("font-family", "Sans-serif");
-        text.setAttribute("text-anchor", "middle");
-        text.textContent = line;
-        wrapper.appendChild(text);
-      });
-
-      const serializer = new XMLSerializer();
-      const svgData = serializer.serializeToString(wrapper);
-      const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${input}.svg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
     }
 
     window.onload = generateBarcode;
