@@ -96,6 +96,11 @@
     }
 
     @media print {
+      @page {
+        size: 101.6mm 152.4mm; /* 4x6 인치 감열지 용지 사이즈 */
+        margin: auto;
+      }
+
       body * {
         visibility: hidden;
       }
