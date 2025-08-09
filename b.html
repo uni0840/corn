@@ -97,7 +97,7 @@
 
     @media print {
       @page {
-        size: 101.6mm 152.4mm; /* 4x6 인치 감열지 용지 사이즈 */
+        size: 101.6mm 152.4mm;
         margin: auto;
       }
 
@@ -139,9 +139,11 @@
     <button id="resetBtn" onclick="resetFields()">리셋</button>
   </div>
 
-  <div id="notice">
+  <!--
+    <div id="notice">
     ❐ 프린트: 바코드 인식 확인 후 사용 권장
   </div>
+  -->
 
   <div id="printArea">
     <svg id="barcode" preserveAspectRatio="xMidYMid meet"></svg>
@@ -184,7 +186,7 @@
       valueDisplay.textContent = input;
 
       if (memo) {
-        memoDisplay.textContent = insertLineBreaks(memo, 16);
+        memoDisplay.textContent = insertLineBreaks(memo, 18);
       }
     }
 
