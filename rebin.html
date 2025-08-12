@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rebin Barcode Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",Arial,sans-serif;
+      margin: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { font-size: 18px; margin-bottom: 16px; }
+    .row { display: flex; flex-direction: column; align-items: center; margin-bottom: 16px; }
+    input[type=text] {
+      width: min(90vw, 300px);
+      padding: 8px;
+      border: 2px solid #606060;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .barcode-box {
+      width: min(90vw, 300px);
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #ddd;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+    .barcode-box svg { max-width: 100%; max-height: 100%; }
+    .small { font-size: 12px; color: #888; margin-top: 4px; }
+    .reset-btn {
+      width: min(90vw, 300px);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #606060;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .reset-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rebin Barcode Generator</h1>
+
+  <!-- 리빈월 -->
+  <div class="row">
+    <input id="inputWall" type="text" placeholder="리빈월 입력" />
+    <div class="barcode-box">
+      <svg id="svgWall" aria-label="rebin-wall barcode"></svg>
+    </div>
+    <div id="wallMsg" class="small"></div>
+  </div>
+
+  <!-- 리빈세트 -->
+  <div class="row">
+    <input id="inputSet" type="text" placeholder="리빈세트 입력" />
+    <div class="barcode-box">
+      <svg id="svgSet" aria-label="rebin-set barcode"></svg>
+    </div>
+    <div id="setMsg" class="small"></div>
+    <button id="resetBtn" class="reset-btn">리셋</button>
+  </div>
+
+  <script>
+    const WALL_PREFIX = "RBS00000061";
+    const SET_PREFIX = "RBW00000093";
+
+    const inputWall = document.getElementById('inputWall');
+    const inputSet = document.getElementById('inputSet');
+    const svgWall = document.getElementById('svgWall');
+    const svgSet = document.getElementById('svgSet');
+    const wallMsg = document.getElementById('wallMsg');
+    const setMsg = document.getElementById('setMsg');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function createBarcode(svgEl, value) {
+      if (!value) { svgEl.innerHTML = ''; return; }
+      try {
+        JsBarcode(svgEl, value, {
+          format: 'CODE128',
+          width: 2,
+          height: 100,
+          displayValue: true,
+          fontSize: 25,
+          margin: 13
+        });
+      } catch (err) {
+        console.error(err);
+        svgEl.innerHTML = '';
+      }
+    }
+
+    function handleInput(inputEl, svgEl, msgEl, prefix) {
+      const rawVal = inputEl.value.trim();
+      const num = parseInt(rawVal, 10);
+      if (!rawVal) {
+        svgEl.innerHTML = '';
+        msgEl.textContent = '';
+        return;
+      }
+      if (!isNaN(num) && num >= 1 && num <= 99) {
+        const code = prefix + String(num).padStart(2, '0');
+        createBarcode(svgEl, code);
+        msgEl.textContent = '';
+      } else {
+        svgEl.innerHTML = '';
+        msgEl.textContent = '결괏값을 찾을 수 없습니다.';
+      }
+    }
+
+    inputWall.addEventListener('input', () => {
+      handleInput(inputWall, svgWall, wallMsg, WALL_PREFIX);
+    });
+
+    inputSet.addEventListener('input', () => {
+      handleInput(inputSet, svgSet, setMsg, SET_PREFIX);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      inputWall.value = '';
+      inputSet.value = '';
+      svgWall.innerHTML = '';
+      svgSet.innerHTML = '';
+      wallMsg.textContent = '';
+      setMsg.textContent = '';
+    });
+  </script>
+</body>
+</html>
