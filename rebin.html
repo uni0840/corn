@@ -1,103 +1,114 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rebin Barcode Generator </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rebin Barcode Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
-      padding: 20px;
       text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    input {
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px;
+      width: min(90vw, 300px);
+      font-size: 16px;
+      box-sizing: border-box;
     }
     .row {
       display: flex;
       justify-content: center;
-      margin-bottom: 10px;
       flex-wrap: wrap;
-    }
-    .row input {
-      margin: 5px;
-      padding: 8px;
-      font-size: 16px;
-    }
-    button {
-      padding: 8px 15px;
-      font-size: 16px;
-      margin: 5px;
+      gap: 5px;
     }
     #barcode {
-      margin-top: 20px;
+      margin: 20px auto;
+      display: block;
+      width: min(90vw, 300px);
     }
-    #resultText {
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      width: min(90vw, 300px);
+      font-size: 16px;
+      cursor: pointer;
       margin-top: 10px;
+    }
+    #resetBtn {
+      background-color: #606060;
+      color: white;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h2>바코드 생성기</h2>
+  <h1>Rebin Barcode Generator</h1>
 
-  <!-- 리빈작업대 -->
+  <!-- 리빈월 + 셀 입력 -->
   <div class="row">
-    <input type="number" id="rbdInput" placeholder="리빈작업대" min="1" max="99" />
-    <button onclick="generateBarcode('rbd')">생성</button>
+    <input type="number" id="rebinMonth" placeholder="리빈월 입력">
+    <input type="text" id="rebinCell" placeholder="셀 번호 입력">
   </div>
 
-  <!-- 리빈월 + 리빈셀 -->
-  <div class="row">
-    <input type="number" id="rbwInput" placeholder="리빈월" min="1" max="99" />
-    <input type="text" id="rbwCellInput" placeholder="리빈셀" />
-    <button onclick="generateBarcode('rbw')">생성</button>
-  </div>
-
+  <!-- 바코드 출력 -->
   <svg id="barcode"></svg>
-  <div id="resultText"></div>
+
+  <!-- 전체 리셋 버튼 -->
+  <button id="resetBtn">전체 리셋</button>
 
   <script>
-    function generateBarcode(type) {
+    const rebinMonthInput = document.getElementById("rebinMonth");
+    const rebinCellInput = document.getElementById("rebinCell");
+    const barcodeElement = document.getElementById("barcode");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function generateBarcode() {
+      let monthVal = rebinMonthInput.value.trim();
+      let cellVal = rebinCellInput.value.trim().toUpperCase(); // 대문자 변환
+
+      if (!monthVal) {
+        barcodeElement.innerHTML = "";
+        return;
+      }
+
       let code = "";
-      let textResult = "";
 
-      if (type === "rbd") {
-        const val = document.getElementById("rbdInput").value.trim();
-        if (!val) {
-          document.getElementById("resultText").textContent = "결괏값을 찾을 수 없습니다.";
-          document.getElementById("barcode").innerHTML = "";
-          return;
-        }
-        code = "RBS00000061" + String(val).padStart(2, "0");
-        textResult = code;
-      } 
-      else if (type === "rbw") {
-        const monthVal = document.getElementById("rbwInput").value.trim();
-        const cellVal = document.getElementById("rbwCellInput").value.trim().toUpperCase();
+      // 리빈월 바코드
+      let monthCode = String(monthVal).padStart(2, "0"); // 두 자리로 맞춤
+      code = `RBW00000093${monthCode}`;
 
-        if (!monthVal) {
-          document.getElementById("resultText").textContent = "결괏값을 찾을 수 없습니다.";
-          document.getElementById("barcode").innerHTML = "";
-          return;
-        }
-
-        const baseCode = "RBW00000093" + String(monthVal).padStart(2, "0");
-
-        if (cellVal) {
-          code = baseCode + "-" + cellVal + "-1";
-        } else {
-          code = baseCode;
-        }
-        textResult = code;
+      // 셀 번호가 있을 경우 확장
+      if (cellVal) {
+        code = `${code}-${cellVal}-1`;
       }
 
       JsBarcode("#barcode", code, {
         format: "CODE128",
         width: 2,
-        height: 60,
-        displayValue: true
+        height: 100,
+        displayValue: true,
+        fontSize: 20,
+        margin: 10
       });
-      document.getElementById("resultText").textContent = textResult;
     }
+
+    // 이벤트 바인딩
+    rebinMonthInput.addEventListener("input", generateBarcode);
+    rebinCellInput.addEventListener("input", generateBarcode);
+
+    // 전체 리셋
+    resetBtn.addEventListener("click", () => {
+      rebinMonthInput.value = "";
+      rebinCellInput.value = "";
+      barcodeElement.innerHTML = "";
+    });
   </script>
 </body>
 </html>
