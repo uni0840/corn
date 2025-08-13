@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rebin Barcode Generator</title>
+  <!-- <title>Rebin Barcode Generator</title> -->
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
@@ -14,21 +14,18 @@
     }
     input {
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #606060;
       padding: 10px;
       margin: 5px;
       width: min(90vw, 300px);
       font-size: 16px;
       box-sizing: border-box;
     }
-    .row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 5px;
+    .half-input {
+      width: calc(min(90vw, 300px) / 2 - 5px);
     }
-    #barcode {
-      margin: 20px auto;
+    svg {
+      margin: 10px auto;
       display: block;
       width: min(90vw, 300px);
     }
@@ -49,65 +46,81 @@
   </style>
 </head>
 <body>
-  <h1>Rebin Barcode Generator</h1>
+  <!-- <h1>Rebin Barcode Generator</h1> -->
 
-  <!-- 리빈월 + 셀 입력 -->
-  <div class="row">
-    <input type="number" id="rebinMonth" placeholder="리빈월 입력">
-    <input type="text" id="rebinCell" placeholder="셀 번호 입력">
+  <!-- 1행: 리빈작업대 입력란 -->
+  <input type="number" id="rebinTable" placeholder="리빈작업대" min="1" max="99">
+
+  <!-- 2행: 리빈작업대 바코드 -->
+  <svg id="barcodeTable"></svg>
+
+  <!-- 3행: 리빈월 + 셀 입력란 -->
+  <div>
+    <input type="number" id="rebinMonth" placeholder="리빈월" min="1" max="99" class="half-input">
+    <input type="text" id="rebinCell" placeholder="셀 번호" class="half-input">
   </div>
 
-  <!-- 바코드 출력 -->
-  <svg id="barcode"></svg>
+  <!-- 4행: 리빈월 바코드 -->
+  <svg id="barcodeMonth"></svg>
 
-  <!-- 전체 리셋 버튼 -->
+  <!-- 5행: 전체 리셋 버튼 -->
   <button id="resetBtn">전체 리셋</button>
 
   <script>
+    const rebinTableInput = document.getElementById("rebinTable");
     const rebinMonthInput = document.getElementById("rebinMonth");
     const rebinCellInput = document.getElementById("rebinCell");
-    const barcodeElement = document.getElementById("barcode");
+    const barcodeTable = document.getElementById("barcodeTable");
+    const barcodeMonth = document.getElementById("barcodeMonth");
     const resetBtn = document.getElementById("resetBtn");
 
-    function generateBarcode() {
-      let monthVal = rebinMonthInput.value.trim();
-      let cellVal = rebinCellInput.value.trim().toUpperCase(); // 대문자 변환
-
-      if (!monthVal) {
-        barcodeElement.innerHTML = "";
+    function generateTableBarcode() {
+      let tableVal = rebinTableInput.value.trim();
+      if (!tableVal) {
+        barcodeTable.innerHTML = "";
         return;
       }
-
-      let code = "";
-
-      // 리빈월 바코드
-      let monthCode = String(monthVal).padStart(2, "0"); // 두 자리로 맞춤
-      code = `RBW00000093${monthCode}`;
-
-      // 셀 번호가 있을 경우 확장
-      if (cellVal) {
-        code = `${code}-${cellVal}-1`;
-      }
-
-      JsBarcode("#barcode", code, {
+      let code = "RBS00000061" + String(tableVal).padStart(2, "0");
+      JsBarcode("#barcodeTable", code, {
         format: "CODE128",
         width: 2,
         height: 100,
-        displayValue: true,
-        fontSize: 20,
-        margin: 10
+        displayValue: true
       });
     }
 
-    // 이벤트 바인딩
-    rebinMonthInput.addEventListener("input", generateBarcode);
-    rebinCellInput.addEventListener("input", generateBarcode);
+    function generateMonthBarcode() {
+      let monthVal = rebinMonthInput.value.trim();
+      let cellVal = rebinCellInput.value.trim().toUpperCase();
 
-    // 전체 리셋
+      if (!monthVal) {
+        barcodeMonth.innerHTML = "";
+        return;
+      }
+
+      let code = "RBW00000093" + String(monthVal).padStart(2, "0");
+      if (cellVal) {
+        code += "-" + cellVal + "-1";
+      }
+
+      JsBarcode("#barcodeMonth", code, {
+        format: "CODE128",
+        width: 2,
+        height: 100,
+        displayValue: true
+      });
+    }
+
+    rebinTableInput.addEventListener("input", generateTableBarcode);
+    rebinMonthInput.addEventListener("input", generateMonthBarcode);
+    rebinCellInput.addEventListener("input", generateMonthBarcode);
+
     resetBtn.addEventListener("click", () => {
+      rebinTableInput.value = "";
       rebinMonthInput.value = "";
       rebinCellInput.value = "";
-      barcodeElement.innerHTML = "";
+      barcodeTable.innerHTML = "";
+      barcodeMonth.innerHTML = "";
     });
   </script>
 </body>
